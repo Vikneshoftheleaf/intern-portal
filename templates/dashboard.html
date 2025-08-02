@@ -1,0 +1,108 @@
+{% extends "layout.html" %}
+
+{% block title %} Dashboard {% endblock %}
+
+{% block content %}
+
+
+<section class=" min-h-screen">
+    <div id="dashboard" class="max-w-4xl m-auto grid lg:md:grid-cols-2 grid-cols-1 gap-8">
+    </div>
+    <h1 class="my-8 font-semibold text-center text-lg">Leaderboard</h1>
+    <div id="leaderboard" class="w-full max-w-4xl m-auto space-y-4 mt-4">
+    </div>
+
+    <script>
+        async function loadDashboard() {
+            const res = await fetch('/api/dashboard');
+            const data = await res.json();
+
+            const { profile, donation, rewards } = data;
+
+            document.getElementById('dashboard').innerHTML = `
+
+        <!-- Profile Card -->
+        <div class="bg-white rounded-2xl shadow-md p-6 flex flex-col gap-8">
+            <div>
+                <div class="w-full flex justify-start items-center mb-2">
+                    <h3 class="text-sm font-semibold text-red-600 bg-slate-100 rounded-full px-2 py-1">User Profile</h3>
+                </div>
+                <div class="flex gap-8 p-4 items-center">
+                    <img src="${profile.image_url}" class="w-24 h-24 rounded-full border-4 border-red-500" />
+                    <div>
+                        <h2 class="text-xl font-semibold text-gray-800 my-2">${profile.name}</h2>
+                        <p>Referal Code</p>
+                        <button class="px-4 mt-2 py-2 bg-gray-100 text-red-500 font-light rounded-lg">${profile.referal_code}</button>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <div class="flex flex-col justify-between gap-4">
+                        <div class="w-full flex justify-start items-center">
+                    <h3 class="text-sm font-semibold text-red-600 bg-slate-100 rounded-full px-2 py-1">Donation Summary</h3>
+                </div>
+                    <div class="flex lg:md:flex-row flex-col gap-8 justify-center items-center">
+                    
+                        <div class="flex flex-col gap-2">
+                        <p class="text-gray-700 text-4xl font-bold">₹${donation.total_amount}</p>
+                        <p class="text-gray-700 text-sm">Raised ${donation.total_donations} donations</p>
+
+                        </div>
+                        <div>
+                            <button class="bg-red-500 px-6 py-3 rounded-lg text-slate-100 font-semibold flex items-center gap-2 cursor-pointer">Raise Donation <i class="bi bi-heart-fill"></i></button>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+  
+        </div>
+
+        
+
+        <!-- Rewards Card -->
+        <div class=" bg-white rounded-2xl shadow-md p-6">
+           <div class="w-full flex justify-start items-center mb-4">
+                <h3 class="text-sm font-semibold text-red-600 bg-slate-100 rounded-full px-2 py-1">Rewards Collected</h3>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                ${rewards.items.map(reward => `
+                <div class="flex flex-col items-center text-center p-4 bg-gray-100 rounded-lg">
+                    <img src="${reward.image_url}" alt="${reward.name}" class="w-12 aspect-square mb-2" />
+                    <p class="text-sm font-medium text-gray-700">${reward.name}</p>
+                </div>
+                `).join('')}
+            </div>
+        </div>
+      `;
+        }
+
+        loadDashboard();
+    </script>
+
+    <script>
+        async function loadLeaderboard() {
+            const res = await fetch('/api/leaderboard');
+            const data = await res.json();
+            const container = document.getElementById('leaderboard');
+            container.innerHTML = data.map(user => `
+        <div class="flex items-center bg-white shadow-md rounded-xl p-4">
+          <div class="lg:md:text-xl text-base font-bold lg:md:w-12 w-4 text-center text-gray-600">#${user.position}</div>
+          <img src="${user.image_url}" class="lg:md:w-12 w-10 aspect-sqaure rounded-full object-cover mx-4 border-2 border-red-500">
+          <div class="flex-1">
+            <div class="text-lg font-semibold text-gray-800">${user.name}</div>
+            <div class="text-sm text-gray-500">Raised ${user.no_of_donations} donations</div>
+          </div>
+          <div class="text-right">
+            <div class="text-lg font-bold text-red-600">₹${user.total_donation}</div>
+            <div class="text-xs text-gray-400">Total Amount</div>
+          </div>
+        </div>
+      `).join('');
+        }
+
+        loadLeaderboard();
+    </script>
+</section>
+
+{% endblock %}

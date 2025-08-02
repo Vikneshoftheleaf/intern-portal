@@ -1,0 +1,37 @@
+{% extends "layout.html" %}
+
+{% block title %} Leaderboard {% endblock %}
+
+{% block content %} 
+
+<h1 class="text-2xl font-bold text-center">Top Intern Leaderboard</h1>
+<p class="my-2 font-light text-center text-gray-400">Here are the greatest people with golden heart.</p>
+
+  <div id="leaderboard" class="w-full max-w-4xl m-auto space-y-4 mt-4">
+  </div>
+
+  <script>
+    async function loadLeaderboard() {
+      const res = await fetch('/api/leaderboard');
+      const data = await res.json();
+      const container = document.getElementById('leaderboard');
+      container.innerHTML = data.map(user => `
+        <div class="flex items-center bg-white shadow-md rounded-xl p-4">
+          <div class="lg:md:text-xl text-base font-bold lg:md:w-12 w-4 text-center text-gray-600">#${user.position}</div>
+          <img src="${user.image_url}" class="lg:md:w-12 w-10 aspect-sqaure rounded-full object-cover mx-4 border-2 border-red-500">
+          <div class="flex-1">
+            <div class="text-lg font-semibold text-gray-800">${user.name}</div>
+            <div class="text-sm text-gray-500">Raised ${user.no_of_donations} donations</div>
+          </div>
+          <div class="text-right">
+            <div class="text-lg font-bold text-red-600">₹${user.total_donation}</div>
+            <div class="text-xs text-gray-400">Total Amount</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    loadLeaderboard();
+  </script>
+
+{% endblock %}
